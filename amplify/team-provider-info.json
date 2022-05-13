@@ -1,0 +1,15 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-tanibeamplifytest-dev-101608-authRole",
+      "UnauthRoleArn": "arn:aws:iam::110840261805:role/amplify-tanibeamplifytest-dev-101608-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::110840261805:role/amplify-tanibeamplifytest-dev-101608-authRole",
+      "Region": "ap-northeast-1",
+      "DeploymentBucketName": "amplify-tanibeamplifytest-dev-101608-deployment",
+      "UnauthRoleName": "amplify-tanibeamplifytest-dev-101608-unauthRole",
+      "StackName": "amplify-tanibeamplifytest-dev-101608",
+      "StackId": "arn:aws:cloudformation:ap-northeast-1:110840261805:stack/amplify-tanibeamplifytest-dev-101608/450248f0-d25a-11ec-8d36-0a874e705dad",
+      "AmplifyAppId": "d16fybehz2waat"
+    }
+  }
+}
