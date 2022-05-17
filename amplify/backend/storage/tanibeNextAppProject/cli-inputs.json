@@ -1,0 +1,18 @@
+{
+  "resourceName": "tanibeNextAppProject",
+  "policyUUID": "f2b5ed81",
+  "bucketName": "tanibe-next-app-bucket",
+  "storageAccess": "authAndGuest",
+  "guestAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ],
+  "triggerFunction": "S3Trigger3b5b05cd",
+  "groupAccess": {}
+}

@@ -10,6 +10,18 @@
       "StackName": "amplify-tanibeamplifytest-dev-101608",
       "StackId": "arn:aws:cloudformation:ap-northeast-1:110840261805:stack/amplify-tanibeamplifytest-dev-101608/450248f0-d25a-11ec-8d36-0a874e705dad",
       "AmplifyAppId": "d16fybehz2waat"
+    },
+    "categories": {
+      "auth": {
+        "tanibeamplifytestc63466b2": {},
+        "true": {}
+      },
+      "function": {
+        "S3Trigger3b5b05cd": {
+          "deploymentBucketName": "amplify-tanibeamplifytest-dev-101608-deployment",
+          "s3Key": "amplify-builds/S3Trigger3b5b05cd-4a4239424157636e3537-build.zip"
+        }
+      }
     }
   }
 }

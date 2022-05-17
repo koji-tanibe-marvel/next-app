@@ -8,4 +8,5 @@ type Todo
     id: ID!
     name: String!
     description: String
+    file_url: String
   }

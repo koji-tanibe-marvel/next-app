@@ -15,7 +15,6 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
-import Box from '@mui/material/Box';
 
 const initialState = { name: '', description: '', file_url: '' };
 
@@ -48,7 +47,7 @@ const TodoList: React.VFC = () => {
 
   const closeModal = () => {
     setShowModal(false);
-    if (uploadFileUpd) {
+    if(uploadFileUpd){
       let e: File;
       setUploadFileUpd(e);
       setUploadFileUpdName("No File");
@@ -127,9 +126,9 @@ const TodoList: React.VFC = () => {
   // 更新
   const updateTodoFunc = async (target) => {
     // ファイル変更がある場合
-    if (uploadFileUpd) {
+    if(uploadFileUpd){
       console.log("uploadFileUpd");
-      fileUploadFunc(uploadFileUpd, target.id);
+      fileUploadFunc(uploadFileUpd,target.id);
       let e: File;
       setUploadFileUpd(e);
       setUploadFileUpdName("No File");
@@ -270,9 +269,7 @@ const TodoList: React.VFC = () => {
       <br />
       <br />
       <Button variant="contained" onClick={addTodo}>Create Todo</Button>
-      <br />
-      <Box sx={{ display: 'flex', justifyContent: 'center', border: 1 ,borderColor: 'grey.500'}}>
-      </Box>
+
       {todos.map((unit, index) => (
         <div key={unit.id ? unit.id : index} style={styles.unit}>
           <a>
@@ -363,7 +360,7 @@ const TodoList: React.VFC = () => {
                 </Typography>
               </a>
             </Link>
-            <Button variant="outlined" color="warning" sx={{ m: 0.5 }} onClick={closeModal}>CANCEL</Button>
+            <Button variant="outlined" color="secondary" sx={{ m: 0.5 }} onClick={closeModal}>CANCEL</Button>
             <Button variant="contained" onClick={updateModal}>UPDATE</Button>
           </div>
         </div>
