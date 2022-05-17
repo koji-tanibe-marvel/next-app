@@ -54,13 +54,12 @@ const TodoList: React.VFC = () => {
       setUploadFileUpdName("No File");
     }
   };
-  const openModal = async (unit) => {
+  const openModal = (unit) => {
     setFormStateUpd(unit);
     setShowModal(true);
   };
   const updateModal = () => {
     updateTodoFunc(formStateUpd);
-    closeModal();
   };
 
   // DB情報取得
@@ -71,10 +70,10 @@ const TodoList: React.VFC = () => {
       )) as GraphQLResult<ListTodosQuery>;
       if (unitData.data?.listTodos?.items) {
         const todos = unitData.data.listTodos.items as CreateTodoInput[];
-        console.log(todos);
         setTodos(todos);
+        console.log("fetchTodos");
+        console.log(todos);
       }
-      console.log("fetchTodos");
     } catch (err) {
       console.log('error fetching todos', err);
     }
@@ -91,13 +90,13 @@ const TodoList: React.VFC = () => {
       var info = (await API.graphql(
         graphqlOperation(createTodo, { input: unit }),
       )) as GraphQLResult<CreateTodoInput>;
-      console.log('addTodo');
       if (uploadFile) {
         fileUploadFunc(uploadFile, info["data"]["createTodo"]["id"]);
         let e: File;
         setUploadFile(e);
         setUploadFileName("No File");
       }
+      fetchTodos();
     } catch (err) {
       console.log('error creating todo:', err);
     }
@@ -113,14 +112,13 @@ const TodoList: React.VFC = () => {
       var info = (await API.graphql(
         graphqlOperation(deleteTodo, { input: param }),
       )) as GraphQLResult<DeleteTodoInput>;
-      console.log('deleteTodo');
       if (info["data"]["deleteTodo"]["file_url"]) {
         fileDeleteFunc(bookid);
       }
+      fetchTodos();
     } catch (err) {
       console.log('error deleting todo:', err);
     }
-    fetchTodos();
     return;
   };
 
@@ -128,7 +126,6 @@ const TodoList: React.VFC = () => {
   const updateTodoFunc = async (target) => {
     // ファイル変更がある場合
     if (uploadFileUpd) {
-      console.log("uploadFileUpd");
       fileUploadFunc(uploadFileUpd, target.id);
       let e: File;
       setUploadFileUpd(e);
@@ -138,17 +135,17 @@ const TodoList: React.VFC = () => {
       id: target.id,
       name: target.name,
       description: target.description,
-      file_url: target.file_url,
     };
+    console.log(param);
     try {
       (await API.graphql(
         graphqlOperation(updateTodo, { input: param }),
       )) as GraphQLResult<UpdateTodoInput>;
-      console.log('updateTodo');
       fetchTodos();
     } catch (err) {
       console.log('error updating todo:', err);
     }
+    closeModal();
     return;
   };
 
@@ -167,6 +164,7 @@ const TodoList: React.VFC = () => {
       console.log('error updateFileNameFunc:', err);
     }
     console.log('updateFileNameFunc');
+    console.log(info);
     return;
   };
 
