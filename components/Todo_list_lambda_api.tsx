@@ -17,6 +17,8 @@ import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 
+import { fileUploadFunc_lambda } from '../src/pages/api/lambda_api';
+
 const initialState = { name: '', description: '', file_url: '' };
 
 const TodoList: React.VFC = () => {
@@ -188,13 +190,7 @@ const TodoList: React.VFC = () => {
     let ext = target["name"].split(".").pop();
     // public/todo/以下にアップロード
     let file_name = "todo/" + id + "/todo_list_file." + ext;
-    try {
-      Storage.put(file_name, target)
-        .then(result => console.log('put:', result))
-        .catch(err => console.log(err));
-    } catch (err) {
-      console.log('error fileUploadFunc:', err);
-    }
+    fileUploadFunc_lambda(target, id);
     var url = "https://d2xb3caecocf0s.cloudfront.net/public/" + file_name;
     updateFileNameFunc(id, url);
     return;

@@ -15,6 +15,9 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
+import Box from '@mui/material/Box';
+
+import { fileUploadFunc_lambda } from '../src/pages/api/lambda_api';
 
 const initialState = { name: '', description: '', file_url: '' };
 
@@ -47,158 +50,18 @@ const TodoList: React.VFC = () => {
 
   const closeModal = () => {
     setShowModal(false);
-    if(uploadFileUpd){
+    if (uploadFileUpd) {
       let e: File;
       setUploadFileUpd(e);
       setUploadFileUpdName("No File");
     }
   };
-  const openModal = async (unit) => {
+  const openModal = (unit) => {
     setFormStateUpd(unit);
     setShowModal(true);
   };
   const updateModal = () => {
     updateTodoFunc(formStateUpd);
-    closeModal();
-  };
-
-  // DB情報取得
-  const fetchTodos = async () => {
-    try {
-      const unitData = (await API.graphql(
-        graphqlOperation(listTodos),
-      )) as GraphQLResult<ListTodosQuery>;
-      if (unitData.data?.listTodos?.items) {
-        const todos = unitData.data.listTodos.items as CreateTodoInput[];
-        console.log(todos);
-        setTodos(todos);
-      }
-      console.log("fetchTodos");
-    } catch (err) {
-      console.log('error fetching todos', err);
-    }
-    return;
-  };
-
-  // 新規作成
-  const addTodo = async () => {
-    try {
-      if (!formState.name || !formState.description) return;
-      const unit: CreateTodoInput = { ...formState };
-      setTodos([...todos, unit]);
-      setFormState(initialState);
-      var info = (await API.graphql(
-        graphqlOperation(createTodo, { input: unit }),
-      )) as GraphQLResult<CreateTodoInput>;
-      console.log('addTodo');
-      if (uploadFile) {
-        fileUploadFunc(uploadFile, info["data"]["createTodo"]["id"]);
-        let e: File;
-        setUploadFile(e);
-        setUploadFileName("No File");
-      }
-    } catch (err) {
-      console.log('error creating todo:', err);
-    }
-    return;
-  };
-
-  // 削除
-  const deleteTodoFunc = async (bookid: string) => {
-    try {
-      const param = {
-        id: bookid,
-      };
-      var info = (await API.graphql(
-        graphqlOperation(deleteTodo, { input: param }),
-      )) as GraphQLResult<DeleteTodoInput>;
-      console.log('deleteTodo');
-      if (info["data"]["deleteTodo"]["file_url"]) {
-        fileDeleteFunc(bookid);
-      }
-    } catch (err) {
-      console.log('error deleting todo:', err);
-    }
-    fetchTodos();
-    return;
-  };
-
-  // 更新
-  const updateTodoFunc = async (target) => {
-    // ファイル変更がある場合
-    if(uploadFileUpd){
-      console.log("uploadFileUpd");
-      fileUploadFunc(uploadFileUpd,target.id);
-      let e: File;
-      setUploadFileUpd(e);
-      setUploadFileUpdName("No File");
-    }
-    const param = {
-      id: target.id,
-      name: target.name,
-      description: target.description,
-      file_url: target.file_url,
-    };
-    try {
-      (await API.graphql(
-        graphqlOperation(updateTodo, { input: param }),
-      )) as GraphQLResult<UpdateTodoInput>;
-      console.log('updateTodo');
-      fetchTodos();
-    } catch (err) {
-      console.log('error updating todo:', err);
-    }
-    return;
-  };
-
-  // ファイルURL情報更新
-  const updateFileNameFunc = async (target_id, url) => {
-    const param = {
-      id: target_id,
-      file_url: url,
-    };
-    try {
-      var info = (await API.graphql(
-        graphqlOperation(updateTodo, { input: param }),
-      )) as GraphQLResult<UpdateTodoInput>;
-      fetchTodos();
-    } catch (err) {
-      console.log('error updateFileNameFunc:', err);
-    }
-    console.log('updateFileNameFunc');
-    return;
-  };
-
-
-  // アップロードファイル情報変更(create)
-  const onChangeFile = async (target) => {
-    setUploadFile(target)
-    setUploadFileName(target["name"])
-    return;
-  };
-
-  // アップロードファイル情報変更(update)
-  const onChangeFileUpd = async (target) => {
-    setUploadFileUpd(target)
-    setUploadFileUpdName(target["name"])
-    return;
-  };
-
-  // ファイルアップロード
-  const fileUploadFunc = async (target, id) => {
-    let ext = target["name"].split(".").pop();
-    // public/todo/以下にアップロード
-    let file_name = "todo/" + id + "/todo_list_file." + ext;
-    try {
-      Storage.put(file_name, target)
-        .then(result => console.log('put:', result))
-        .catch(err => console.log(err));
-    } catch (err) {
-      console.log('error fileUploadFunc:', err);
-    }
-    var url = "https://tanibe-next-app-bucket101608-dev.s3.ap-northeast-1.amazonaws.com/public/" + file_name;
-    updateFileNameFunc(id, url);
-    return;
   };
 
   // ファイル削除
@@ -222,6 +85,128 @@ const TodoList: React.VFC = () => {
     } catch (err) {
       console.log('error fileDeleteFunc list:', err);
     }
+    return;
+  };
+
+
+  // DB情報取得
+  const fetchTodos = async () => {
+    try {
+      const unitData = (await API.graphql(
+        graphqlOperation(listTodos),
+      )) as GraphQLResult<ListTodosQuery>;
+      if (unitData.data?.listTodos?.items) {
+        const todos = unitData.data.listTodos.items as CreateTodoInput[];
+        setTodos(todos);
+        console.log("fetchTodos");
+        console.log(todos);
+      }
+    } catch (err) {
+      console.log('error fetching todos', err);
+    }
+    return;
+  };
+
+  // 新規作成
+  const addTodo = async () => {
+    try {
+      if (!formState.name || !formState.description) return;
+      const unit: CreateTodoInput = { ...formState };
+      setTodos([...todos, unit]);
+      setFormState(initialState);
+      var info = (await API.graphql(
+        graphqlOperation(createTodo, { input: unit }),
+      )) as GraphQLResult<CreateTodoInput>;
+      if (uploadFile) {
+        fileUploadFunc_lambda(uploadFile, info["data"]["createTodo"]["id"]);
+        let e: File;
+        setUploadFile(e);
+        setUploadFileName("No File");
+      }
+      fetchTodos();
+    } catch (err) {
+      console.log('error creating todo:', err);
+    }
+    return;
+  };
+
+  // 削除
+  const deleteTodoFunc = async (bookid: string) => {
+    try {
+      const param = {
+        id: bookid,
+      };
+      var info = (await API.graphql(
+        graphqlOperation(deleteTodo, { input: param }),
+      )) as GraphQLResult<DeleteTodoInput>;
+      if (info["data"]["deleteTodo"]["file_url"]) {
+        fileDeleteFunc(bookid);
+      }
+      fetchTodos();
+    } catch (err) {
+      console.log('error deleting todo:', err);
+    }
+    return;
+  };
+
+  // 更新
+  const updateTodoFunc = async (target) => {
+    // ファイル変更がある場合
+    if (uploadFileUpd) {
+      fileUploadFunc_lambda(uploadFileUpd, target.id);
+      let e: File;
+      setUploadFileUpd(e);
+      setUploadFileUpdName("No File");
+    }
+    const param = {
+      id: target.id,
+      name: target.name,
+      description: target.description,
+    };
+    console.log(param);
+    try {
+      (await API.graphql(
+        graphqlOperation(updateTodo, { input: param }),
+      )) as GraphQLResult<UpdateTodoInput>;
+      fetchTodos();
+    } catch (err) {
+      console.log('error updating todo:', err);
+    }
+    closeModal();
+    return;
+  };
+
+  // ファイルURL情報更新
+  const updateFileNameFunc = async (target_id, url) => {
+    const param = {
+      id: target_id,
+      file_url: url,
+    };
+    try {
+      var info = (await API.graphql(
+        graphqlOperation(updateTodo, { input: param }),
+      )) as GraphQLResult<UpdateTodoInput>;
+      fetchTodos();
+    } catch (err) {
+      console.log('error updateFileNameFunc:', err);
+    }
+    console.log('updateFileNameFunc');
+    console.log(info);
+    return;
+  };
+
+
+  // アップロードファイル情報変更(create)
+  const onChangeFile = async (target) => {
+    setUploadFile(target)
+    setUploadFileName(target["name"])
+    return;
+  };
+
+  // アップロードファイル情報変更(update)
+  const onChangeFileUpd = async (target) => {
+    setUploadFileUpd(target)
+    setUploadFileUpdName(target["name"])
     return;
   };
 
@@ -269,7 +254,9 @@ const TodoList: React.VFC = () => {
       <br />
       <br />
       <Button variant="contained" onClick={addTodo}>Create Todo</Button>
-
+      <br />
+      <Box sx={{ display: 'flex', justifyContent: 'center', border: 1, borderColor: 'grey.500' }}>
+      </Box>
       {todos.map((unit, index) => (
         <div key={unit.id ? unit.id : index} style={styles.unit}>
           <a>
@@ -360,7 +347,7 @@ const TodoList: React.VFC = () => {
                 </Typography>
               </a>
             </Link>
-            <Button variant="outlined" color="secondary" sx={{ m: 0.5 }} onClick={closeModal}>CANCEL</Button>
+            <Button variant="outlined" color="warning" sx={{ m: 0.5 }} onClick={closeModal}>CANCEL</Button>
             <Button variant="contained" onClick={updateModal}>UPDATE</Button>
           </div>
         </div>
